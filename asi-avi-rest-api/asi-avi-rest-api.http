@@ -1,0 +1,6 @@
+@asi_avi_rest_api_HostAddress = http://localhost:5171
+
+GET {{asi_avi_rest_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
