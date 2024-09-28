@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using asi_avi_rest_api.Models.EntityFramework.Complexity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
@@ -19,7 +20,9 @@ public partial class Utilisateur
     [StringLength(50)]
     public string? Prenom { get; set; } = null!;
 
+    // Custom validation deported in MobileComplexity class
     [Column("utl_mobile", TypeName = "char(10)")]
+    [MobileComplexity]
     public string? Mobile { get; set; } = null!;
 
     [Required]
@@ -32,12 +35,15 @@ public partial class Utilisateur
     [StringLength(200)]
     public string rue { get; set; } = null!;
 
+
+    // Custom validation deported in PasswordComplexity class
     [Column("utl_pwd")]
-    [StringLength(64)]
+    [PasswordComplexity]
     [NotNull]
     public string Pwd { get; set; } = null!;
 
     [Column("utl_cp", TypeName = "char(5)")]
+    [CodePostalComplexity]
     public string? CodePostal { get; set; } = null!;
 
     [Column("utl_ville")]

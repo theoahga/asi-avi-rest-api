@@ -16,13 +16,13 @@ namespace asi_avi_rest_api.Controllers
         }
 
         // GET: api/Utilisateurs
-        [HttpGet("GetUtilisateurs")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Utilisateur>>> GetUtilisateurs()
         {
             return await _context.Utilisateurs.ToListAsync();
         }
 
-        // GET: api/Utilisateurs/5
+        // GET: api/Utilisateurs/GetUtilisateurById/5
         [HttpGet("GetUtilisateurById/{id}", Name = "GetUtilisateurById")]
         public async Task<ActionResult<Utilisateur>> GetUtilisateurById(int id)
         {
@@ -36,7 +36,7 @@ namespace asi_avi_rest_api.Controllers
             return utilisateur;
         }
 
-        // GET: api/Utilisateurs/tclere@cpe.fr
+        // GET: api/Utilisateurs/GetUtilisateurByEmail/tclere@cpe.fr
         [HttpGet("GetUtilisateurByEmail/{mail}")]
         public async Task<ActionResult<Utilisateur>> GetUtilisateurByEmail(string mail)
         {
@@ -53,7 +53,7 @@ namespace asi_avi_rest_api.Controllers
 
         // PUT: api/Utilisateurs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("PutUtilisateur/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> PutUtilisateur(int id, Utilisateur utilisateur)
         {
             if (id != utilisateur.Idutilisateur)
@@ -84,7 +84,7 @@ namespace asi_avi_rest_api.Controllers
 
         // POST: api/Utilisateurs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("PostUtilisateur")]
+        [HttpPost]
         public async Task<ActionResult<Utilisateur>> PostUtilisateur(Utilisateur utilisateur)
         {
             _context.Utilisateurs.Add(utilisateur);
