@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using asi_avi_rest_api.Models.DataManager;
+using asi_avi_rest_api.Models.Repository;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TP2Console.Models.EntityFramework;
 
@@ -8,25 +10,29 @@ namespace asi_avi_rest_api.Controllers
     [ApiController]
     public class UtilisateursController : ControllerBase
     {
-        private readonly NotationDbContext _context;
+        private readonly IDataRepository<Utilisateur> dataRepository;
+        //private readonly UtilisateurManager utilisateurManager;
+        //private readonly NotationDbContext _context;
 
-        public UtilisateursController(NotationDbContext context)
+        public UtilisateursController(IDataRepository<Utilisateur> dataRepo)
         {
-            _context = context;
+            dataRepository = dataRepo;
         }
 
         // GET: api/Utilisateurs
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Utilisateur>>> GetUtilisateurs()
         {
-            return await _context.Utilisateurs.ToListAsync();
+            return await dataRepository.GetAllAsync();
         }
 
         // GET: api/Utilisateurs/GetUtilisateurById/5
         [HttpGet("GetUtilisateurById/{id}", Name = "GetUtilisateurById")]
         public async Task<ActionResult<Utilisateur>> GetUtilisateurById(int id)
         {
-            var utilisateur = await _context.Utilisateurs.FindAsync(id);
+
+            var utilisateur = await dataRepository.GetByIdAsync(id);
+            //var utilisateur = _context.Utilisateurs.FindAsync(id);
 
             if (utilisateur == null)
             {
@@ -40,8 +46,9 @@ namespace asi_avi_rest_api.Controllers
         [HttpGet("GetUtilisateurByEmail/{mail}")]
         public async Task<ActionResult<Utilisateur>> GetUtilisateurByEmail(string mail)
         {
-            var utilisateur = await _context.Utilisateurs
-                .FirstOrDefaultAsync(u => u.Mail.ToLower() == mail.ToLower());
+            var utilisateur = await dataRepository.GetByStringAsync(mail);
+            //var utilisateur = _context.Utilisateurs
+            //    .FirstOrDefaultAsync(u => u.Mail.ToLower() == mail.ToLower());
 
             if (utilisateur == null)
             {
@@ -54,32 +61,23 @@ namespace asi_avi_rest_api.Controllers
         // PUT: api/Utilisateurs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUtilisateur(int id, Utilisateur utilisateur)
+        public async Task<IActionResult> PutUtilisateurAsync(int id, Utilisateur utilisateur)
         {
             if (id != utilisateur.Idutilisateur)
             {
                 return BadRequest();
             }
 
-            _context.Entry(utilisateur).State = EntityState.Modified;
-
-            try
+            var userToUpdate = dataRepository.GetById(id);
+            if (userToUpdate == null)
             {
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!UtilisateurExists(id))
-                {
-                    return NotFound("Id utilisateur inconnu");
-                }
-                else
-                {
-                    throw;
-                }
+                await dataRepository.UpdateAsync(userToUpdate.Value, utilisateur);
+                return NoContent();
             }
-
-            return NoContent();
         }
 
         // POST: api/Utilisateurs
@@ -91,31 +89,24 @@ namespace asi_avi_rest_api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            _context.Utilisateurs.Add(utilisateur);
-            await _context.SaveChangesAsync();
+            await dataRepository.AddAsync(utilisateur);
 
             return CreatedAtAction("GetUtilisateurById", new { id = utilisateur.Idutilisateur }, utilisateur);
         }
 
         // DELETE: api/Utilisateurs/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteUtilisateur(int id)
-        //{
-        //    var utilisateur = await _context.Utilisateurs.FindAsync(id);
-        //    if (utilisateur == null)
-        //    {
-        //        return NotFound("Id utilisateur inconnu");
-        //    }
-
-        //    _context.Utilisateurs.Remove(utilisateur);
-        //    await _context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
-
-        private bool UtilisateurExists(int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUtilisateur(int id)
         {
-            return _context.Utilisateurs.Any(e => e.Idutilisateur == id);
+            var utilisateur = await dataRepository.GetByIdAsync(id);
+            if (utilisateur == null)
+            {
+                return NotFound("Id utilisateur inconnu");
+            }
+
+            dataRepository.DeleteAsync(utilisateur.Value);
+
+            return NoContent();
         }
     }
 }
