@@ -68,8 +68,8 @@ namespace asi_avi_rest_api.Controllers
                 return BadRequest();
             }
 
-            var userToUpdate = dataRepository.GetById(id);
-            if (userToUpdate == null)
+            var userToUpdate = await dataRepository.GetByIdAsync(id);
+            if (userToUpdate == null || userToUpdate.Value == null)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace asi_avi_rest_api.Controllers
         public async Task<IActionResult> DeleteUtilisateur(int id)
         {
             var utilisateur = await dataRepository.GetByIdAsync(id);
-            if (utilisateur == null)
+            if (utilisateur == null || utilisateur.Value == null)
             {
                 return NotFound("Id utilisateur inconnu");
             }
 
-            dataRepository.DeleteAsync(utilisateur.Value);
+            await dataRepository.DeleteAsync(utilisateur.Value);
 
             return NoContent();
         }
