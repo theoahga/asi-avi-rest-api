@@ -1,48 +1,85 @@
 ﻿@page "/search-users";
+@page "/user-search"
 @using asi_avi_web_app.Services
 @using asi_avi_web_app.Models
 @inject IService<Utilisateur> iService
-<PageTitle>Recherche d'utilisateur'</PageTitle>
+
+<PageTitle>Recherche d'utilisateur</PageTitle>
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
 <h1>Rechercher un utilisateur</h1>
-<p>Email à rechercher</p>
-<input type="text"/>
-<Button Color="ButtonColor.Primary"> Rechercher </Button>
+<p>Email à rechercher :</p>
+<input type="text" @bind="@inputValue" />
+<Button Color="ButtonColor.Primary" @onclick="OnSearchUser"> Rechercher </Button>
 
-@if (users == null)
+@if (user == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>Aucun résultat.</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Mail</th>
-                <th>Mobile</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in users)
-            {
-                <tr>
-                    <td>@user.Nom</td>
-                    <td>@user.Prenom</td>
-                    <td>@user.Mail</td>
-                    <td>@user.Mobile</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <br />
+    <p>Nom</p>
+    <input type="text" @bind="@user.Nom" />
+    <p>Prenom</p>
+    <input type="text" @bind="@user.Prenom" />
+    <p>Mobile</p>
+    <input type="number" @bind="@user.Mobile" />
+    <p>Mail</p>
+    <input type="text" @bind="@user.Mail" required/>
+    <p>Password</p>
+    <input type="text" @bind="@user.Pwd" required/>
+    <p>Code postal</p>
+    <input type="text" @bind="@user.CodePostal" />
+    <p>Ville</p>
+    <input type="text" @bind="@user.Ville" />
+    <p>Pays</p> 
+    <input type="text" @bind="@user.Pays" />
+
+    <br />
+    <Button Color="ButtonColor.Primary" @onclick="OnModifyUser"> Modifier </Button>
 }
 
 @code {
-    private List<Utilisateur> users;
+    private Utilisateur user;
+    private string inputValue = string.Empty;
+    List<ToastMessage> messages = new List<ToastMessage>();
 
-    protected override async Task OnInitializedAsync()
+    private void ShowMessage(ToastType toastType, String message) => messages.Add(CreateToastMessage(toastType, message));
+
+    private async Task OnSearchUser()
     {
-        users = await iService.GetAllAsync("Utilisateurs");
+        user = await iService.GetByEmailAsync(inputValue);
     }
+
+    private async void OnModifyUser()
+    {
+        bool modified = await iService.PutAsync(user);
+        if (modified)
+        {
+            ShowMessage(ToastType.Success, "The user has been correctly updated.");
+            user = null;
+
+        }
+        else
+        {
+            ShowMessage(ToastType.Danger, "An error appears during the user update");
+        }
+        StateHasChanged();
+    }
+
+    private ToastMessage CreateToastMessage(ToastType toastType, String message)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Message = message,
+        };
+
+    private string GetInvalidClass(string value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "invalid-input" : string.Empty;
+    }
+
 }
+    

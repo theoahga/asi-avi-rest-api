@@ -2,11 +2,11 @@
 {
     public interface IService<TEntity>
     {
-        Task<List<TEntity?>> GetAllAsync(string? nomControleur);
-        Task<TEntity?> GetByIdAsync(string? nomControleur, int? id);
-        Task<TEntity?> GetByStringAsync(string? nomControleur,string? str);
-        Task<bool> PostAsync(string? nomControleur,TEntity? str);
-        Task<bool> PutAsync(string? nomControleur, TEntity? str);
-        Task<bool> DeleteAsync(string? nomControleur, TEntity? str);
+        Task<List<TEntity?>> GetAllAsync();
+        Task<TEntity?> GetByIdAsync(int? id);
+        Task<TEntity?> GetByEmailAsync(string? str);
+        Task<bool> PostAsync(TEntity? str);
+        Task<bool> PutAsync(TEntity? str);
+        Task<bool> DeleteAsync(TEntity? str);
     }
 }

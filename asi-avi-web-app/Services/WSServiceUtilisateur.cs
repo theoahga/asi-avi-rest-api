@@ -7,6 +7,7 @@ namespace asi_avi_web_app.Services
     public class WSServiceUtilisateur : IService<Utilisateur>
     {
         private readonly HttpClient httpClient;
+        private readonly String nomControleur = "Utilisateurs";
 
         public WSServiceUtilisateur()
         {
@@ -16,12 +17,12 @@ namespace asi_avi_web_app.Services
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public Task<bool> DeleteAsync(string? nomControleur, Utilisateur? utilisateur)
+        public Task<bool> DeleteAsync(Utilisateur? utilisateur)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<List<Utilisateur?>> GetAllAsync(string? nomControleur)
+        public async Task<List<Utilisateur?>> GetAllAsync()
         {
             try
             {
@@ -33,24 +34,81 @@ namespace asi_avi_web_app.Services
             }
         }
 
-        public Task<Utilisateur?> GetByIdAsync(string? nomControleur, int? id)
+        public async Task<Utilisateur?> GetByIdAsync( int? id)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(nomControleur) || id == null)
+                return null;
+
+            try
+            {
+                string url = $"{nomControleur}/GetUtilisateurById/{id}";
+                return await httpClient.GetFromJsonAsync<Utilisateur>(url);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetByIdAsync: {ex.Message}");
+                return null;
+            }
         }
 
-        public Task<Utilisateur?> GetByStringAsync(string? nomControleur, string? str)
+        public async Task<Utilisateur?> GetByEmailAsync(string? email)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(nomControleur) || string.IsNullOrEmpty(email))
+                return null;
+
+            try
+            {
+                string url = $"{nomControleur}/GetUtilisateurByEmail/{Uri.EscapeDataString(email)}";
+                return await httpClient.GetFromJsonAsync<Utilisateur>(url);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetByEmailAsync: {ex.Message}");
+                return null;
+            }
         }
 
-        public Task<bool> PostAsync(string? nomControleur, Utilisateur? str)
+
+        public async Task<bool> PostAsync(Utilisateur? utilisateur)
         {
-            throw new NotImplementedException();
+            if (utilisateur == null)
+                return false;
+
+            try
+            {
+                var response = await httpClient.PostAsJsonAsync(nomControleur, utilisateur);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in PostAsync: {ex.Message}");
+                return false;
+            }
         }
 
-        public Task<bool> PutAsync(string? nomControleur, Utilisateur? str)
+        public async Task<bool> PutAsync(Utilisateur? utilisateur)
         {
-            throw new NotImplementedException();
+            if (utilisateur == null)
+                return false;
+
+            try
+            {
+                string url = $"{nomControleur}/{utilisateur.Idutilisateur}";
+                var response = await httpClient.PutAsJsonAsync(url, utilisateur);
+
+                if (response.IsSuccessStatusCode)
+                    return true;
+
+                Console.WriteLine($"PutAsync failed with status code: {response.StatusCode}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in PutAsync: {ex}");
+                return false;
+            }
         }
+
+
     }
 }

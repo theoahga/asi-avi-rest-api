@@ -41,6 +41,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        users = await iService.GetAllAsync("Utilisateurs");
+        users = await iService.GetAllAsync();
     }
 }
