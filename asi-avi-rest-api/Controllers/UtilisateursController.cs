@@ -68,14 +68,14 @@ namespace asi_avi_rest_api.Controllers
                 return BadRequest();
             }
 
-            var userToUpdate = dataRepository.GetById(id);
+            var userToUpdate = dataRepository.GetByIdAsync(id);
             if (userToUpdate == null)
             {
                 return NotFound();
             }
             else
             {
-                await dataRepository.UpdateAsync(userToUpdate.Value, utilisateur);
+                await dataRepository.UpdateAsync(userToUpdate.Result.Value, utilisateur);
                 return NoContent();
             }
         }
