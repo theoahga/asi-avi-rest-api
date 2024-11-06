@@ -215,17 +215,19 @@ namespace asi_avi_rest_apiTests.Controllers
             Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
-        [TestMethod]
-        public void DeleteUtilisateurTest_AvecMoq()
-        {
-            // Arrange
-            var mockRepository = new Mock<IDataRepository<Utilisateur>>();
-            var userController = new UtilisateursController(mockRepository.Object);
-            // Act
-            var actionResult = userController.DeleteUtilisateur(1).Result;
-            // Assert
-            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
-        }
+
+        /*    Ne passe pas et c'est normal ! cf DeleteUtilisateurTest_AvecMoqV2
+              [TestMethod]
+                public void DeleteUtilisateurTest_AvecMoq()
+                {
+                    // Arrange
+                    var mockRepository = new Mock<IDataRepository<Utilisateur>>();
+                    var userController = new UtilisateursController(mockRepository.Object);
+                    // Act
+                    var actionResult = userController.DeleteUtilisateur(1).Result;
+                    // Assert
+                    Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
+                }*/
 
         [TestMethod]
         public void DeleteUtilisateurTest_AvecMoqV2()
