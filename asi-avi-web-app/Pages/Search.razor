@@ -12,8 +12,13 @@
 <p>Email à rechercher :</p>
 <input type="text" @bind="@inputValue" />
 <Button Color="ButtonColor.Primary" @onclick="OnSearchUser"> Rechercher </Button>
+@if (creationMode == false)
+{
+    <Button Color="ButtonColor.Primary" @onclick="ToggleCreationMode"> Ajouter </Button>
+}
 
-@if (user == null)
+
+@if (user == null && creationMode == false)
 {
     <p><em>Aucun résultat.</em></p>
 }
@@ -38,13 +43,22 @@ else
     <input type="text" @bind="@user.Pays" />
 
     <br />
-    <Button Color="ButtonColor.Primary" @onclick="OnModifyUser"> Modifier </Button>
+    @if (creationMode == false)
+    {
+        <Button Color="ButtonColor.Primary" @onclick="OnModifyUser"> Modifier </Button>
+    }
+    else
+    {
+        <Button Color="ButtonColor.Primary" @onclick="OnAddUser"> Ajouter </Button>
+    }
+
 }
 
 @code {
     private Utilisateur user;
     private string inputValue = string.Empty;
     List<ToastMessage> messages = new List<ToastMessage>();
+    private Boolean creationMode = false;
 
     private void ShowMessage(ToastType toastType, String message) => messages.Add(CreateToastMessage(toastType, message));
 
@@ -69,6 +83,12 @@ else
         StateHasChanged();
     }
 
+    private async void ToggleCreationMode()
+    {
+        creationMode = true;
+        user = new Utilisateur();
+    }
+
     private ToastMessage CreateToastMessage(ToastType toastType, String message)
     => new ToastMessage
         {
@@ -79,6 +99,21 @@ else
     private string GetInvalidClass(string value)
     {
         return string.IsNullOrWhiteSpace(value) ? "invalid-input" : string.Empty;
+    }
+
+    private async void OnAddUser()
+    {
+        bool modified = await iService.PostAsync(user);
+        if (modified)
+        {
+            ShowMessage(ToastType.Success, "The user has been correctly added.");
+            user = null;
+        }
+        else
+        {
+            ShowMessage(ToastType.Danger, "An error appears during the user addition");
+        }
+        StateHasChanged();
     }
 
 }

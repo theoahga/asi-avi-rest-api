@@ -1,6 +1,10 @@
 ﻿using asi_avi_web_app.Models;
+using Newtonsoft.Json;
+using System;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace asi_avi_web_app.Services
 {
@@ -34,7 +38,7 @@ namespace asi_avi_web_app.Services
             }
         }
 
-        public async Task<Utilisateur?> GetByIdAsync( int? id)
+        public async Task<Utilisateur?> GetByIdAsync(int? id)
         {
             if (string.IsNullOrEmpty(nomControleur) || id == null)
                 return null;
@@ -71,17 +75,17 @@ namespace asi_avi_web_app.Services
 
         public async Task<bool> PostAsync(Utilisateur? utilisateur)
         {
-            if (utilisateur == null)
-                return false;
-
             try
             {
-                var response = await httpClient.PostAsJsonAsync(nomControleur, utilisateur);
+
+                Dictionary<string, object> nonNullProps = GetNonNullProperties(utilisateur);
+                var response = await httpClient.PostAsJsonAsync(nomControleur, JsonConvert.SerializeObject(nonNullProps));
+                Console.WriteLine(response);
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in PostAsync: {ex.Message}");
+                Console.WriteLine($"Error in PostAsync: {ex}");
                 return false;
             }
         }
@@ -108,7 +112,21 @@ namespace asi_avi_web_app.Services
                 return false;
             }
         }
+        private static Dictionary<string, object> GetNonNullProperties(object obj)
+        {
+            var propertiesMap = new Dictionary<string, object>();
 
+            var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(obj);
+                if (value != null)
+                {
+                    propertiesMap.Add(property.Name, value);
+                }
+            }
 
+            return propertiesMap;
+        }
     }
 }
