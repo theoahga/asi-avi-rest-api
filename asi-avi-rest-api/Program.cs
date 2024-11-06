@@ -3,7 +3,18 @@ using asi_avi_rest_api.Models.Repository;
 using Microsoft.EntityFrameworkCore;
 using TP2Console.Models.EntityFramework;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7183");
+                      });
+});
 
 // Add services to the container.
 builder.Services.AddScoped<IDataRepository<Utilisateur>, UtilisateurManager>();
@@ -25,6 +36,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 

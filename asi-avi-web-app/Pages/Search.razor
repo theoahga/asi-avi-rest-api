@@ -1,0 +1,48 @@
+﻿@page "/search-users";
+@using asi_avi_web_app.Services
+@using asi_avi_web_app.Models
+@inject IService<Utilisateur> iService
+<PageTitle>Recherche d'utilisateur'</PageTitle>
+
+<h1>Rechercher un utilisateur</h1>
+<p>Email à rechercher</p>
+<input type="text"/>
+<Button Color="ButtonColor.Primary"> Rechercher </Button>
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Mail</th>
+                <th>Mobile</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.Nom</td>
+                    <td>@user.Prenom</td>
+                    <td>@user.Mail</td>
+                    <td>@user.Mobile</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Utilisateur> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await iService.GetAllAsync("Utilisateurs");
+    }
+}
