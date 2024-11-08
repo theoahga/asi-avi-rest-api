@@ -1,0 +1,120 @@
+﻿@page "/search-users";
+@page "/user-search"
+@using asi_avi_web_app.Services
+@using asi_avi_web_app.Models
+@inject IService<Utilisateur> iService
+
+<PageTitle>Recherche d'utilisateur</PageTitle>
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<h1>Rechercher un utilisateur</h1>
+<p>Email à rechercher :</p>
+<input type="text" @bind="@inputValue" />
+<Button Color="ButtonColor.Primary" @onclick="OnSearchUser"> Rechercher </Button>
+@if (creationMode == false)
+{
+    <Button Color="ButtonColor.Primary" @onclick="ToggleCreationMode"> Ajouter </Button>
+}
+
+
+@if (user == null && creationMode == false)
+{
+    <p><em>Aucun résultat.</em></p>
+}
+else
+{
+    <br />
+    <p>Nom</p>
+    <input type="text" @bind="@user.Nom" />
+    <p>Prenom</p>
+    <input type="text" @bind="@user.Prenom" />
+    <p>Mobile</p>
+    <input type="number" @bind="@user.Mobile" />
+    <p>Mail</p>
+    <input type="text" @bind="@user.Mail" required/>
+    <p>Password</p>
+    <input type="text" @bind="@user.Pwd" required/>
+    <p>Code postal</p>
+    <input type="text" @bind="@user.CodePostal" />
+    <p>Ville</p>
+    <input type="text" @bind="@user.Ville" />
+    <p>Pays</p> 
+    <input type="text" @bind="@user.Pays" />
+
+    <br />
+    @if (creationMode == false)
+    {
+        <Button Color="ButtonColor.Primary" @onclick="OnModifyUser"> Modifier </Button>
+    }
+    else
+    {
+        <Button Color="ButtonColor.Primary" @onclick="OnAddUser"> Ajouter </Button>
+    }
+
+}
+
+@code {
+    private Utilisateur user;
+    private string inputValue = string.Empty;
+    List<ToastMessage> messages = new List<ToastMessage>();
+    private Boolean creationMode = false;
+
+    private void ShowMessage(ToastType toastType, String message) => messages.Add(CreateToastMessage(toastType, message));
+
+    private async Task OnSearchUser()
+    {
+        user = await iService.GetByEmailAsync(inputValue);
+    }
+
+    private async void OnModifyUser()
+    {
+        bool modified = await iService.PutAsync(user);
+        if (modified)
+        {
+            ShowMessage(ToastType.Success, "The user has been correctly updated.");
+            user = null;
+
+        }
+        else
+        {
+            ShowMessage(ToastType.Danger, "An error appears during the user update");
+        }
+        StateHasChanged();
+    }
+
+    private async void ToggleCreationMode()
+    {
+        creationMode = true;
+        user = new Utilisateur();
+    }
+
+    private ToastMessage CreateToastMessage(ToastType toastType, String message)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Message = message,
+        };
+
+    private string GetInvalidClass(string value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "invalid-input" : string.Empty;
+    }
+
+    private async void OnAddUser()
+    {
+        bool modified = await iService.PostAsync(user);
+        if (modified)
+        {
+            ShowMessage(ToastType.Success, "The user has been correctly added.");
+            user = null;
+        }
+        else
+        {
+            ShowMessage(ToastType.Danger, "An error appears during the user addition");
+        }
+        StateHasChanged();
+    }
+
+}
+    
