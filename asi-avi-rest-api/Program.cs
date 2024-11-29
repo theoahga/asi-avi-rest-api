@@ -1,9 +1,12 @@
+using asi_avi_rest_api.Models.DataManager;
+using asi_avi_rest_api.Models.Repository;
 using Microsoft.EntityFrameworkCore;
 using TP2Console.Models.EntityFramework;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<IDataRepository<Utilisateur>, UtilisateurManager>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

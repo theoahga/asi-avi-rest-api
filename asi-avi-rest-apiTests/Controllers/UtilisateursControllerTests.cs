@@ -1,4 +1,6 @@
 ﻿using asi_avi_rest_api.Controllers;
+using asi_avi_rest_api.Models.DataManager;
+using asi_avi_rest_api.Models.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.ContentModel;
@@ -12,6 +14,7 @@ namespace asi_avi_rest_apiTests.Controllers
     [TestClass]
     public class UtilisateursControllerTests
     {
+        private IDataRepository<Utilisateur> dataRepository;
         private readonly NotationDbContext _context;
         private UtilisateursController controller;
        public UtilisateursControllerTests() 
@@ -20,7 +23,8 @@ namespace asi_avi_rest_apiTests.Controllers
                 .UseNpgsql("Server=localhost;port=5432;Database=NotationDB;uid=postgres;password=postgres;");
 
             _context = new NotationDbContext(builder.Options);
-            controller = new UtilisateursController(_context);
+            dataRepository = new UtilisateurManager(_context);
+            controller = new UtilisateursController(dataRepository);
         }
 
         [TestMethod]
